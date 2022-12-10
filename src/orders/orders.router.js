@@ -10,10 +10,14 @@ const methodNotAllowed = require("../errors/methodNotAllowed");
 
 
 
-router.route("/").get(controller.list).all(methodNotAllowed)
+router.route("/")
+    .get(controller.list)
+    .all(methodNotAllowed)
 
 
-router.route("/:orderId").get(controller.read).all(methodNotAllowed)
+router.route("/:orderId")
+    .get(controller.read)
+    .all(methodNotAllowed)
 
 
 

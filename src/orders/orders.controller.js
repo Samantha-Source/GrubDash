@@ -6,10 +6,12 @@ const nextId = require("../utils/nextId");
 const notFound = require("../errors/notFound");
 // TODO: Implement the /orders handlers needed to make the tests pass
 
+// GET ("/orders")
 function list(req, res, next) {
   res.json({ data: orders });
 }
 
+// FIND MATCHING ORDER BY ID
 function findOrder(req, res, next) {
   const { orderId } = req.params;
   const foundOrder = orders.find((order) => order.id === orderId);
@@ -22,9 +24,13 @@ function findOrder(req, res, next) {
   next({ status: 404, message: `Path not found: ${req.originalUrl}` });
 }
 
+// GET ("/orders/orderId")
 function read(req, res, next) {
   res.json({ data: res.locals.foundOrder });
 }
+
+
+
 
 module.exports = {
   list,

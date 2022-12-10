@@ -34,6 +34,7 @@ function read(req, res, next) {
     res.json({ data:res.locals.foundDish })
 }
 
+// VALIDATE INPUTS FOR CREATE & UPDATE
 function validateDish(req, res, next){
     const { data: {id, name, description, price, image_url} ={} } = req.body;
     const newDish = {
@@ -70,8 +71,7 @@ function validateDish(req, res, next){
 // POST ("/dishes")
 function create(req, res, next){
     const newDish = res.locals.newDish;
-    const newId = nextId()
-    newDish.id = newId;
+    newDish.id = nextId();
     dishes.push(res.locals.newDish);
     res.status(201).json({ data:res.locals.newDish })
 }
@@ -83,6 +83,7 @@ function update(req, res, next){
     const foundDish = res.locals.foundDish;
     const newDish = res.locals.newDish
 
+    // if there is an id on the form it must match the url's dishId
     if(newDish.id){
         if(newDish.id !== dishId){
             return next({status:400, message:`Dish id does not match route id.  Dish: ${newDish.id}, Route:${dishId}`})
@@ -95,7 +96,6 @@ function update(req, res, next){
     foundDish.image_url = image_url;
 
     res.status(200).json({ data:foundDish })
-    // if id is present it must match :dishId
 }
 
 
