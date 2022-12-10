@@ -24,7 +24,8 @@ function findDish(req, res, next) {
     return next();
   }
 //   next(notFound);    // CAN WE USE THE IMPORT?
-  next({ status: 404, message: `Path not found: ${req.originalUrl}` })
+//   next({ status: 404, message: `Path not found: ${req.originalUrl}` })
+    next({ status: 404, message: `Dish does not exist ${dishId}`});
 }
 
 
@@ -34,10 +35,9 @@ function read(req, res, next) {
 }
 
 function validateDish(req, res, next){
-    const { data: {name, description, price, image_url} ={} } = req.body;
-    const newId = nextId()
+    const { data: {id, name, description, price, image_url} ={} } = req.body;
     const newDish = {
-        id:newId,
+        id,
         name,
         description,
         price,
@@ -67,16 +67,36 @@ function validateDish(req, res, next){
 }
 
 
-
-
 // POST ("/dishes")
 function create(req, res, next){
+    const newDish = res.locals.newDish;
+    const newId = nextId()
+    newDish.id = newId;
     dishes.push(res.locals.newDish);
     res.status(201).json({ data:res.locals.newDish })
 }
 
+// PUT ("/dishes/:dishId")
+function update(req, res, next){
+    const { data: {id, name, description, price, image_url} ={} } = req.body;
+    const {dishId} = req.params;
+    const foundDish = res.locals.foundDish;
+    const newDish = res.locals.newDish
 
+    if(newDish.id){
+        if(newDish.id !== dishId){
+            return next({status:511, message:`Dish id does not match route id.  Dish: ${newDish.id}, Route:${dishId}`})
+        }
+    }
 
+    foundDish.name = name;
+    foundDish.description = description;
+    foundDish.price = price,
+    foundDish.image_url = image_url;
+
+    res.status(201).json({ data:foundDish })
+    // if id is present it must match :dishId
+}
 
 
 
@@ -86,4 +106,5 @@ module.exports = {
     list,
     read:[findDish, read],
     create:[validateDish, create],
+    update:[findDish, validateDish, update]
 };
