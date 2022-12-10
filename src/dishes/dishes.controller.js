@@ -85,7 +85,7 @@ function update(req, res, next){
 
     if(newDish.id){
         if(newDish.id !== dishId){
-            return next({status:511, message:`Dish id does not match route id.  Dish: ${newDish.id}, Route:${dishId}`})
+            return next({status:400, message:`Dish id does not match route id.  Dish: ${newDish.id}, Route:${dishId}`})
         }
     }
 
@@ -94,7 +94,7 @@ function update(req, res, next){
     foundDish.price = price,
     foundDish.image_url = image_url;
 
-    res.status(201).json({ data:foundDish })
+    res.status(200).json({ data:foundDish })
     // if id is present it must match :dishId
 }
 
