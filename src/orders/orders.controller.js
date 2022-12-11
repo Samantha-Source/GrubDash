@@ -4,6 +4,7 @@ const orders = require(path.resolve("src/data/orders-data"));
 // Use this function to assigh ID's when necessary
 const nextId = require("../utils/nextId");
 const notFound = require("../errors/notFound");
+const { findIndex } = require("../data/orders-data");
 // TODO: Implement the /orders handlers needed to make the tests pass
 
 // GET ("/orders")
@@ -59,12 +60,18 @@ function validateOrder(req, res, next){
 function validateDishForOrder(req,res,next){
     const {dishes} = res.locals.newOrder;
     for(let dish of dishes){
-        if(!dish.quantity || dish.quantity === 0){
-            next({status:400, message:`Dish ${dish.index} must have a quantity that is an integer greater than 0`})
+        // let dishIndex = dishes.findIndex(dish => dish.id === dishes.dish.id)
+        if(!dish.quantity || dish.quantity === 0 || !Number.isInteger(dish.quantity)){
+            // let dishIndex = dishes.findIndex(dish => dish.id === dish.id)
+            let dishIndex = dishes.indexOf(dish)
+            next({status:400, message:`Dish ${dishIndex} must have a quantity that is an integer greater than 0`})
         }
     }
     next()
 }
+
+
+
 
 function create(req,res,next){
     const newOrder = res.locals.newOrder;
