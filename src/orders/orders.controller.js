@@ -31,7 +31,7 @@ function read(req, res, next) {
   res.json({ data: res.locals.foundOrder });
 }
 
-// VALIDATE ORDER INFO FOR READ & UPDATE
+// VALIDATE ORDER INFO FOR CREATE & UPDATE
 function validateOrder(req, res, next){
     const { data: {id, deliverTo, mobileNumber, dishes} ={} } = req.body;
     const newOrder = {
@@ -90,6 +90,22 @@ function destroy(req, res, next){
     res.sendStatus(204)
 }
 
+// PUT ("/orders/:orderId")
+function update(req, res, next){
+    const foundOrder = res.locals.foundOrder;
+
+    if(!foundOrder.id){
+        return next({status:404, message:"Order not found"})
+    }
+    if(!foundOrder.status || foundOrder.status ===""){
+        return next({status:400, message:"Order must have a status of pending, preparing, out-for-delivery, delivered, "})
+    }
+    if(foundOrder.status === "delivered"){
+        return next({status:400, message:"A delivered order cannot be changed"})
+    }
+
+
+}
 
 
 
@@ -100,4 +116,5 @@ module.exports = {
   read: [findOrder, read],
   create: [validateOrder, validateDishForOrder, create],
   delete:[findOrder, destroy],
+  update:[findOrder,validateOrder,validateDishForOrder, update]
 };
