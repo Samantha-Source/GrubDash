@@ -96,15 +96,14 @@ function destroy(req, res, next){
 function update(req, res, next){
 
     const {id, deliverTo, mobileNumber, status, dishes} = res.locals.orderForm
-    // const orderForm = res.locals.orderForm;
     const {orderId} = req.params;
     const foundOrder = res.locals.foundOrder;
 
     if(!res.locals.orderForm){
         return next({status:404, message:"Order not found"})
     }
-    if(!status || status ===""){
-        return next({status:400, message:"Order must have a status of pending, preparing, out-for-delivery, delivered, "})
+    if(!status || status == " " || status == "invalid"){
+        return next({status:400, message:"Order must have a status of pending, preparing, out-for-delivery, delivered"})
     }
     if(status === "delivered"){
         return next({status:400, message:"A delivered order cannot be changed"})
@@ -112,6 +111,7 @@ function update(req, res, next){
     if(id && id !== orderId){
         return next({status:400, message:`Order id does not match route id. Order id:${id}, Route:${orderId}`})
     }
+  
 
     foundOrder.deliverTo = deliverTo;
     foundOrder.mobileNumber = mobileNumber;
