@@ -72,8 +72,8 @@ function validateDish(req, res, next){
 function create(req, res, next){
     const newDish = res.locals.newDish;
     newDish.id = nextId();
-    dishes.push(res.locals.newDish);
-    res.status(201).json({ data:res.locals.newDish })
+    dishes.push(newDish);
+    res.status(201).json({ data:newDish })
 }
 
 // PUT ("/dishes/:dishId")
@@ -92,10 +92,10 @@ function update(req, res, next){
 
     foundDish.name = name;
     foundDish.description = description;
-    foundDish.price = price,
+    foundDish.price = price;
     foundDish.image_url = image_url;
 
-    res.status(200).json({ data:foundDish })
+    res.status(200).json({ data:foundDish });
 }
 
 
