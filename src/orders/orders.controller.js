@@ -32,7 +32,7 @@ function read(req, res, next) {
 }
 
 // VALIDATE ORDER INFO FOR CREATE & UPDATE
-function validateOrder(req, res, next){
+function validateOrderForm(req, res, next){
     const { data: {id, deliverTo, mobileNumber, status, dishes} ={} } = req.body;
     const orderForm = {
         id,
@@ -102,8 +102,11 @@ function update(req, res, next){
     if(!res.locals.orderForm){
         return next({status:404, message:"Order not found"})
     }
-    if(!status || status == " " || status == "invalid"){
+    if(!status || status === ""){
         return next({status:400, message:"Order must have a status of pending, preparing, out-for-delivery, delivered"})
+    }
+    if(status !== "pending" && status !== "preparing" && status !== "out-for-delivery"){
+        return next({status:400, message:"Order must have a status of pending, preparing, out-for-delivry"})
     }
     if(status === "delivered"){
         return next({status:400, message:"A delivered order cannot be changed"})
@@ -127,7 +130,7 @@ function update(req, res, next){
 module.exports = {
   list,
   read: [findOrder, read],
-  create: [validateOrder, validateDishForOrder, create],
+  create: [validateOrderForm, validateDishForOrder, create],
   delete:[findOrder, destroy],
-  update:[findOrder, validateOrder,validateDishForOrder, update]
+  update:[findOrder, validateOrderForm, validateDishForOrder, update]
 };
