@@ -18,6 +18,7 @@ router.route("/")
 
 router.route("/:orderId")
     .get(controller.read)
+    .delete(controller.delete)
     .all(methodNotAllowed)
 
 

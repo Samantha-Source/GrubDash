@@ -7,6 +7,7 @@ const notFound = require("../errors/notFound");
 const { findIndex } = require("../data/orders-data");
 // TODO: Implement the /orders handlers needed to make the tests pass
 
+
 // GET ("/orders")
 function list(req, res, next) {
   res.json({ data: orders });
@@ -30,6 +31,7 @@ function read(req, res, next) {
   res.json({ data: res.locals.foundOrder });
 }
 
+// VALIDATE ORDER INFO FOR READ & UPDATE
 function validateOrder(req, res, next){
     const { data: {id, deliverTo, mobileNumber, dishes} ={} } = req.body;
     const newOrder = {
@@ -51,18 +53,15 @@ function validateOrder(req, res, next){
     if(Array.isArray(dishes) == false || dishes.length < 1){
         return next({status:400, message:"Order must include at least one dish"})
     }
-    //NEED TO CHECK FOR THE INDIVIDUAL DISH PROPERTIES
-    //IMPORT DISHES CONTROLLER FUNCTION VALIDATEDISH
     res.locals.newOrder = newOrder;
     next()
 }
 
-function validateDishForOrder(req,res,next){
+// VALIDATE DISHES IN AN ORDER
+function validateDishForOrder(req, res, next){
     const {dishes} = res.locals.newOrder;
     for(let dish of dishes){
-        // let dishIndex = dishes.findIndex(dish => dish.id === dishes.dish.id)
         if(!dish.quantity || dish.quantity === 0 || !Number.isInteger(dish.quantity)){
-            // let dishIndex = dishes.findIndex(dish => dish.id === dish.id)
             let dishIndex = dishes.indexOf(dish)
             next({status:400, message:`Dish ${dishIndex} must have a quantity that is an integer greater than 0`})
         }
@@ -70,19 +69,35 @@ function validateDishForOrder(req,res,next){
     next()
 }
 
-
-
-
-function create(req,res,next){
+// POST ("/orders")
+function create(req, res, next){
     const newOrder = res.locals.newOrder;
     newOrder.id = nextId()
     orders.push(newOrder);
     res.status(201).json({ data:newOrder })
 }
 
+// DELETE ("/orders/:orderId")
+function destroy(req, res, next){
+    const { orderId } = req.params;
+    const {status} = res.locals.foundOrder;
+    const index = orders.findIndex((order) => order.id === orderId)
+
+    if(status !== 'pending'){
+        return next({status:400, message:"An order cannot be deleted unless it is pending."})
+    }
+    const deletedOrders = orders.splice(index,1)
+    res.sendStatus(204)
+}
+
+
+
+
+
 
 module.exports = {
   list,
   read: [findOrder, read],
-  create: [validateOrder, validateDishForOrder, create]
+  create: [validateOrder, validateDishForOrder, create],
+  delete:[findOrder, destroy],
 };
