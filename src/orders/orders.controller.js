@@ -23,7 +23,7 @@ function findOrder(req, res, next) {
     next();
   }
   // next(notFound)
-  next({ status: 404, message: `Path not found: ${req.originalUrl}` });
+  return next({ status: 404, message: `Path not found: ${req.originalUrl}` });
 }
 
 // GET ("/orders/orderId")
@@ -33,11 +33,12 @@ function read(req, res, next) {
 
 // VALIDATE ORDER INFO FOR CREATE & UPDATE
 function validateOrder(req, res, next){
-    const { data: {id, deliverTo, mobileNumber, dishes} ={} } = req.body;
-    const newOrder = {
+    const { data: {id, deliverTo, mobileNumber, status, dishes} ={} } = req.body;
+    const orderForm = {
         id,
         deliverTo,
         mobileNumber,
+        status,
         dishes,
     }
 
@@ -53,13 +54,13 @@ function validateOrder(req, res, next){
     if(Array.isArray(dishes) == false || dishes.length < 1){
         return next({status:400, message:"Order must include at least one dish"})
     }
-    res.locals.newOrder = newOrder;
-    next()
+    res.locals.orderForm = orderForm;
+    return next()
 }
 
 // VALIDATE DISHES IN AN ORDER
 function validateDishForOrder(req, res, next){
-    const {dishes} = res.locals.newOrder;
+    const {dishes} = res.locals.orderForm;
     for(let dish of dishes){
         if(!dish.quantity || dish.quantity === 0 || !Number.isInteger(dish.quantity)){
             let dishIndex = dishes.indexOf(dish)
@@ -71,9 +72,10 @@ function validateDishForOrder(req, res, next){
 
 // POST ("/orders")
 function create(req, res, next){
-    const newOrder = res.locals.newOrder;
+    const newOrder = res.locals.orderForm;
     newOrder.id = nextId()
     orders.push(newOrder);
+    // res.locals.newOrder = newOrder;
     res.status(201).json({ data:newOrder })
 }
 
@@ -92,19 +94,30 @@ function destroy(req, res, next){
 
 // PUT ("/orders/:orderId")
 function update(req, res, next){
+
+    const {id, deliverTo, mobileNumber, status, dishes} = res.locals.orderForm
+    // const orderForm = res.locals.orderForm;
+    const {orderId} = req.params;
     const foundOrder = res.locals.foundOrder;
 
-    if(!foundOrder.id){
+    if(!res.locals.orderForm){
         return next({status:404, message:"Order not found"})
     }
-    if(!foundOrder.status || foundOrder.status ===""){
+    if(!status || status ===""){
         return next({status:400, message:"Order must have a status of pending, preparing, out-for-delivery, delivered, "})
     }
-    if(foundOrder.status === "delivered"){
+    if(status === "delivered"){
         return next({status:400, message:"A delivered order cannot be changed"})
     }
+    if(id && id !== orderId){
+        return next({status:400, message:`Order id does not match route id. Order id:${id}, Route:${orderId}`})
+    }
 
+    foundOrder.deliverTo = deliverTo;
+    foundOrder.mobileNumber = mobileNumber;
+    foundOrder.dishes = dishes;
 
+    res.status(200).json({data:foundOrder})
 }
 
 
@@ -116,5 +129,5 @@ module.exports = {
   read: [findOrder, read],
   create: [validateOrder, validateDishForOrder, create],
   delete:[findOrder, destroy],
-  update:[findOrder,validateOrder,validateDishForOrder, update]
+  update:[findOrder, validateOrder,validateDishForOrder, update]
 };
