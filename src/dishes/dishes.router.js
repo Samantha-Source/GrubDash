@@ -3,12 +3,10 @@ const controller = require("./dishes.controller");
 
 // ERROR HANDLERS
 const methodNotAllowed = require("../errors/methodNotAllowed");
-// NOT SURE IF I NEED THESE 2 HERE.....
-const errorHandler = require("../errors/errorHandler");
-const notFound = require("../errors/notFound");
 
 
-// TODO: Implement the /dishes routes needed to make the tests pass
+
+// ROUTES
 
 router.route("/")
     .get(controller.list)
@@ -17,15 +15,10 @@ router.route("/")
     
 
 
-
 router.route("/:dishId")
     .get(controller.read)
     .put(controller.update)
     .all(methodNotAllowed)
-
-
-
-
 
 
 
