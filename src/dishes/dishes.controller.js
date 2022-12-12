@@ -79,14 +79,14 @@ function create(req, res, next){
 // PUT ("/dishes/:dishId")
 function update(req, res, next){
     const { data: {id, name, description, price, image_url} ={} } = req.body;
-    const {dishId} = req.params;
+    const { dishId } = req.params;
     const foundDish = res.locals.foundDish;
-    const newDish = res.locals.newDish
+    const newDish = res.locals.newDish;
 
     // if there is an id on the form it must match the url's dishId
     if(newDish.id){
         if(newDish.id !== dishId){
-            return next({status:400, message:`Dish id does not match route id.  Dish: ${newDish.id}, Route:${dishId}`})
+            return next({status:400, message:`Dish id does not match route id.  Dish: ${newDish.id}, Route:${dishId}`});
         }
     }
 
