@@ -88,12 +88,10 @@ function destroy(req, res, next) {
     res.sendStatus(204);
 };
 
-// PUT ("/orders/:orderId")
-function update(req, res, next){
-
-    const { id, deliverTo, mobileNumber, status, dishes } = res.locals.orderForm;
+// VALIDATE ORDER FOR UPDATE
+function validateUpdate(req, res, next) {
+    const { id, status } = res.locals.orderForm;
     const { orderId } = req.params;
-    const foundOrder = res.locals.foundOrder;
 
     if(!res.locals.orderForm){
         return next({status:404, message:"Order not found"});
@@ -102,7 +100,7 @@ function update(req, res, next){
         return next({status:400, message:"Order must have a status of pending, preparing, out-for-delivery, delivered"});
     };
     if(status !== "pending" && status !== "preparing" && status !== "out-for-delivery"){
-        return next({status:400, message:"Order must have a status of pending, preparing, out-for-delivry"});
+        return next({status:400, message:"Order must have a status of pending, preparing, out-for-delivery"});
     };
     if(status === "delivered"){
         return next({status:400, message:"A delivered order cannot be changed"});
@@ -110,15 +108,20 @@ function update(req, res, next){
     if(id && id !== orderId){
         return next({status:400, message:`Order id does not match route id. Order id:${id}, Route:${orderId}`});
     };
+    next();
+};
+
+// PUT ("/orders/:orderId")
+function update(req, res, next){
+    const { deliverTo, mobileNumber, dishes } = res.locals.orderForm;
+    const foundOrder = res.locals.foundOrder;
 
     foundOrder.deliverTo = deliverTo;
     foundOrder.mobileNumber = mobileNumber;
     foundOrder.dishes = dishes;
 
-    res.status(200).json({data:foundOrder})
-}
-
-
+    res.status(200).json({data:foundOrder});
+};
 
 
 
@@ -127,5 +130,5 @@ module.exports = {
   read:[findOrder, read],
   create:[validateOrderForm, validateDishForOrder, create],
   delete:[findOrder, destroy],
-  update:[findOrder, validateOrderForm, validateDishForOrder, update]
+  update:[findOrder, validateOrderForm, validateDishForOrder, validateUpdate, update]
 };
