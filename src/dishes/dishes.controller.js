@@ -6,7 +6,7 @@ const nextId = require("../utils/nextId");
 
 
 // GET ("/dishes")
-function list(req, res, next) {
+function list(req, res) {
     res.json({ data: dishes });
   };
 
@@ -22,7 +22,7 @@ function findDish(req, res, next) {
 };
 
 // GET ("/dishes/:dishId")
-function read(req, res, next) {
+function read(req, res) {
     res.json({ data:res.locals.foundDish });
 };
 
@@ -60,7 +60,7 @@ function validateDish(req, res, next) {
 };
 
 // POST ("/dishes")
-function create(req, res, next) {
+function create(req, res) {
     const newDish = res.locals.newDish;
     newDish.id = nextId();
     dishes.push(newDish);
@@ -81,7 +81,7 @@ function validateUpdate(req, res, next) {
 }
 
 // PUT ("/dishes/:dishId")
-function update(req, res, next) {
+function update(req, res) {
     const { data: {name, description, price, image_url} ={} } = req.body;
     const foundDish = res.locals.foundDish;
 

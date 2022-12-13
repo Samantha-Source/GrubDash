@@ -7,7 +7,7 @@ const nextId = require("../utils/nextId");
 
 
 // GET ("/orders")
-function list(req, res, next) {
+function list(req, res) {
   res.json({ data: orders });
 };
 
@@ -68,7 +68,7 @@ function validateDishForOrder(req, res, next) {
 };
 
 // POST ("/orders")
-function create(req, res, next) {
+function create(req, res) {
     const newOrder = res.locals.orderForm;
     newOrder.id = nextId();
     orders.push(newOrder);
@@ -112,7 +112,7 @@ function validateUpdate(req, res, next) {
 };
 
 // PUT ("/orders/:orderId")
-function update(req, res, next){
+function update(req, res){
     const { deliverTo, mobileNumber, dishes } = res.locals.orderForm;
     const foundOrder = res.locals.foundOrder;
 
